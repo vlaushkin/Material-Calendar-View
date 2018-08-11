@@ -39,6 +39,10 @@ public class CalendarActivity extends AppCompatActivity {
         calendar2.add(Calendar.DAY_OF_MONTH, 5);
         events.add(new EventDay(calendar2, R.drawable.sample_icon_3));
 
+        Calendar calendar3 = Calendar.getInstance();
+        calendar3.add(Calendar.DAY_OF_MONTH, 7);
+        events.add(new EventDay(calendar3, "12345", R.color.colorAccent));
+
         CalendarView calendarView = (CalendarView) findViewById(R.id.calendarView);
 
         Calendar min = Calendar.getInstance();
@@ -49,6 +53,11 @@ public class CalendarActivity extends AppCompatActivity {
 
         calendarView.setMinimumDate(min);
         calendarView.setMaximumDate(max);
+        try {
+            calendarView.setDate(Calendar.getInstance());
+        } catch (OutOfDateRangeException e) {
+            e.printStackTrace();
+        }
 
         calendarView.setEvents(events);
 

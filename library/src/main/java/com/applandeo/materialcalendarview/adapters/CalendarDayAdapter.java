@@ -3,6 +3,7 @@ package com.applandeo.materialcalendarview.adapters;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,15 +55,16 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
             view = mLayoutInflater.inflate(mCalendarProperties.getItemLayoutResource(), parent, false);
         }
 
-        TextView dayLabel = (TextView) view.findViewById(R.id.dayLabel);
-        ImageView dayIcon = (ImageView) view.findViewById(R.id.dayIcon);
+        TextView dayLabel = view.findViewById(R.id.dayLabel);
+        ImageView dayIcon = view.findViewById(R.id.dayIcon);
+        TextView subText = view.findViewById(R.id.daySubtext);
 
         Calendar day = new GregorianCalendar();
         day.setTime(getItem(position));
 
         // Loading an image of the event
         if (dayIcon != null) {
-            loadIcon(dayIcon, day);
+            loadEvents(dayIcon, subText, day);
         }
 
         setLabelColors(dayLabel, day);
@@ -115,7 +117,7 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
         return !mCalendarProperties.getDisabledDays().contains(day);
     }
 
-    private void loadIcon(ImageView dayIcon, Calendar day) {
+    private void loadEvents(ImageView dayIcon, TextView subText, Calendar day) {
         if (mCalendarProperties.getEventDays() == null || mCalendarProperties.getCalendarType() != CalendarView.CLASSIC) {
             dayIcon.setVisibility(View.GONE);
             return;
@@ -123,14 +125,18 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
 
         Stream.of(mCalendarProperties.getEventDays()).filter(eventDate ->
                 eventDate.getCalendar().equals(day)).findFirst().executeIfPresent(eventDay -> {
+                    if (eventDay.hasImage()) {
+                        ImageUtils.loadResource(dayIcon, eventDay.getImageResource());
 
-            ImageUtils.loadResource(dayIcon, eventDay.getImageResource());
-
-            // If a day doesn't belong to current month then image is transparent
-            if (!isCurrentMonthDay(day) || !isActiveDay(day)) {
-                dayIcon.setAlpha(0.12f);
-            }
-
+                        // If a day doesn't belong to current month then image is transparent
+                        if (!isCurrentMonthDay(day) || !isActiveDay(day)) {
+                            dayIcon.setAlpha(0.12f);
+                        }
+                    } else {
+                        subText.setText(eventDay.getSubText());
+                        subText.setTextColor(ContextCompat.getColor(getContext(),
+                                eventDay.getSubTextColor()));
+                    }
         });
     }
 }
