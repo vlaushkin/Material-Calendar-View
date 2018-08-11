@@ -64,6 +64,7 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
 
         // Loading an image of the event
         if (dayIcon != null) {
+            dayIcon.setVisibility(View.INVISIBLE);
             loadEvents(dayIcon, subText, day);
         }
 
@@ -126,6 +127,8 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
         Stream.of(mCalendarProperties.getEventDays()).filter(eventDate ->
                 eventDate.getCalendar().equals(day)).findFirst().executeIfPresent(eventDay -> {
                     if (eventDay.hasImage()) {
+                        dayIcon.setVisibility(View.VISIBLE);
+                        subText.setVisibility(View.GONE);
                         ImageUtils.loadResource(dayIcon, eventDay.getImageResource());
 
                         // If a day doesn't belong to current month then image is transparent
@@ -133,6 +136,8 @@ class CalendarDayAdapter extends ArrayAdapter<Date> {
                             dayIcon.setAlpha(0.12f);
                         }
                     } else {
+                        subText.setVisibility(View.VISIBLE);
+                        dayIcon.setVisibility(View.GONE);
                         subText.setText(eventDay.getSubText());
                         subText.setTextColor(ContextCompat.getColor(getContext(),
                                 eventDay.getSubTextColor()));
